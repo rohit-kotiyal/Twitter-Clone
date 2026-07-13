@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from .forms import TweetForm
 from django.contrib.auth.decorators import login_required
 from .models import Tweet
@@ -27,3 +28,35 @@ def feed(request):
     tweets = Tweet.objects.all().order_by('-created_at')
 
     return render(request, 'tweets/feed.html', {'tweets': tweets})
+
+
+
+@login_required
+def delete_tweet(request, tweet_id):
+    tweet = get_object_or_404(Tweet, pk=tweet_id)
+
+    if tweet.author != request.user:
+        return HttpResponseForbidden("You can't delete this tweet.")
+    
+    
+    tweet.delete()
+    return redirect('feed')
+
+
+@login_required
+def edit_tweet(request, tweet_id):
+    tweet = get_object_or_404(Tweet, pk=tweet_id)
+
+    if(tweet.author != request.user):
+        return HttpResponseForbidden("You can't edit this tweet.")
+    
+    if request.method == 'POST':
+        form = TweetForm(request.POST, instance=tweet)
+
+        if form.is_valid():
+            form.save()
+            return redirect('feed')
+    else:
+        form = TweetForm(instance=tweet)
+
+    return render(request, 'tweets/edit_tweet.html', {'form': form})
