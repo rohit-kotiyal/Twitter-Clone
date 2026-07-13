@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Feed
+{% endblock %}
+
+{% block content %}
+
+    {% for tweet in tweets %}
+        <div>
+            <h2>{{tweet.author.username}}</h2>
+            <p>{{tweet.content}}</p>
+        </div>
+
+        {% empty %}
+                <p>No tweets yet.</p>
+    {% endfor %}
+
+{% endblock %}
