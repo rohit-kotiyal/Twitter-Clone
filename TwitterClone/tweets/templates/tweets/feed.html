@@ -10,6 +10,16 @@
         <div>
             <a href="{% url 'profile' tweet.author.username %}"><h2>{{tweet.author.username}}</h2></a>
             <p>{{tweet.content}}</p>
+            <form action="{% url 'toggle_like' tweet.id %}" method="POST">
+                {% csrf_token %}
+                
+                {% if tweet.id in liked_tweet_ids %}
+                    <button type="submit">Unlike {{tweet.likes.count}}</button>
+                {% else %}
+                    <button type="submit">Like {{tweet.likes.count}}</button>
+                {% endif %}
+                    
+            </form>
         </div>
         
         

@@ -14,3 +14,20 @@ class Tweet(models.Model):
     
 
 
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="likes")
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name="likes")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} liked {self.tweet} tweet."
+    
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'tweet'], name='unique_like')
+        ]
+    
+    
+
+

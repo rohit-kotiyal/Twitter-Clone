@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 from .forms import TweetForm
 from django.contrib.auth.decorators import login_required
-from .models import Tweet
+from .models import Tweet, Like
 
 
 # Create your views here.
@@ -61,3 +61,30 @@ def edit_tweet(request, tweet_id):
         form = TweetForm(instance=tweet)
 
     return render(request, 'tweets/edit_tweet.html', {'form': form})
+
+
+@login_required
+def toggle_like(request, tweet_id):
+    tweet = get_object_or_404(Tweet, pk=tweet_id)
+
+    like = Like.objects.filter(user=request.user, tweet=tweet)
+
+    if(like.exists()):
+        like.delete()
+
+    else:
+        like.create(user=request.user, tweet=tweet)
+
+    return redirect('feed')
+
+
+
+def feed(request):
+    tweets = Tweet.objects.all().order_by('-created_at')
+
+    if request.user.is_authenticated:
+        liked_tweet_ids = set(Like.objects.filter(user=request.user).values_list('tweet_id', flat=True))
+    else:
+        liked_tweet_ids = set()
+    
+    return render(request, 'tweets/feed.html', {'tweets': tweets, 'liked_tweet_ids': liked_tweet_ids})
