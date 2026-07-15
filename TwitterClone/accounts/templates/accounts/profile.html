@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block content %}
+    <div>
+        <h1>{{profile_user.username}}</h1>
+        <h5>{{profile_user.profile.location}}</h5>
+        <p>Followers:{{followers}} Following:{{following}}</p>
+        <p>{{profile_user.profile.bio}}</p>
+
+        
+        {% if user != profile_user %}
+            <form action="{% url 'toggle_follow' profile_user.id %}" method="POST">
+                {% csrf_token %}
+                
+                {% if is_following %}
+                    <button type="submit">Unfollow</button> 
+
+                {% else %}
+                    <button type="submit">Follow</button> 
+                {% endif %}
+            </form>   
+        {% endif %}   
+    </div>
+    <div>
+        {% for tweet in tweets %}
+            <p>{{tweet.content}}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

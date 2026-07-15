@@ -8,10 +8,18 @@
 
     {% for tweet in tweets %}
         <div>
-            <h2>{{tweet.author.username}}</h2>
+            <a href="{% url 'profile' tweet.author.username %}"><h2>{{tweet.author.username}}</h2></a>
             <p>{{tweet.content}}</p>
         </div>
         
+        
+        {% if tweet.author != user %}
+            <form action="{% url 'toggle_follow' tweet.author.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Follow/Unfollow</button>
+            </form>
+        {% endif %}
+            
         
         {% if tweet.author == user %}
             <a href="{% url 'edit_tweet' tweet.id %}">Edit</a>
