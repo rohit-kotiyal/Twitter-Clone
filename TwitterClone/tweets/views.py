@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import HttpResponseForbidden, HttpResponseNotAllowed, JsonResponse
 from .forms import TweetForm
 from django.contrib.auth.decorators import login_required
 from .models import Tweet, Like
@@ -68,14 +68,17 @@ def toggle_like(request, tweet_id):
     tweet = get_object_or_404(Tweet, pk=tweet_id)
 
     like = Like.objects.filter(user=request.user, tweet=tweet)
+    is_liked_now = None
 
     if(like.exists()):
+        is_liked_now = False
         like.delete()
 
     else:
+        is_liked_now = True
         like.create(user=request.user, tweet=tweet)
 
-    return redirect('feed')
+    return JsonResponse({'liked': is_liked_now, 'like_count': like.count()})
 
 
 

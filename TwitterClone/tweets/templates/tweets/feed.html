@@ -10,25 +10,27 @@
         <div>
             <a href="{% url 'profile' tweet.author.username %}"><h2>{{tweet.author.username}}</h2></a>
             <p>{{tweet.content}}</p>
-            <form action="{% url 'toggle_like' tweet.id %}" method="POST">
+            <form class="like-form" data-tweet-id="{{tweet.id}}" data-url="{% url 'toggle_like' tweet.id %}" method="POST">
                 {% csrf_token %}
                 
-                {% if tweet.id in liked_tweet_ids %}
-                    <button type="submit">Unlike {{tweet.likes.count}}</button>
-                {% else %}
-                    <button type="submit">Like {{tweet.likes.count}}</button>
-                {% endif %}
-                    
+                <button class="like-btn" type="submit">
+                    {% if tweet.id in liked_tweet_ids %}
+                        <span class="like-label">Unlike</span>
+                    {% else %}
+                        <span class="like-label">Like</span>
+                    {% endif %}
+                    (<span class="like-count">{{ tweet.likes.count }}</span>)
+                </button>
             </form>
         </div>
         
         
-        {% if tweet.author != user %}
+        <!-- {% if tweet.author != user %}
             <form action="{% url 'toggle_follow' tweet.author.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit">Follow/Unfollow</button>
             </form>
-        {% endif %}
+        {% endif %} -->
             
         
         {% if tweet.author == user %}
@@ -43,4 +45,28 @@
                 <p>No tweets yet.</p>
     {% endfor %}
 
+{% endblock %}
+
+
+
+{% block scripts %}
+    <script>
+        document.querySelectorAll(".like-form").forEach((form)=>{
+            form.addEventListener('submit', function(event){
+                event.preventDefault();
+
+                fetch(form.dataset.url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                }).then(response => response.json()).then(data => {
+                    const label = form.querySelector('.like-label');
+                    const count = form.querySelector('.like-count');
+                    label.textContent = data.liked ? 'Unlike' : 'Like';
+                    count.textContent = data.like_count;
+                })
+            })
+        })
+    </script>
 {% endblock %}

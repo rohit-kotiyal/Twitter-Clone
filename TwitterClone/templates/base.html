@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,5 +12,9 @@
 </head>
 <body>
     {% block content %}{% endblock %}
+    
+    <script src="{% static 'js/utils.js' %}"></script>
+    {% block scripts %}{% endblock %}
+    
 </body>
 </html>

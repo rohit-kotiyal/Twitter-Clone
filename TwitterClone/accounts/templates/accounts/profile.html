@@ -8,20 +8,22 @@
     <div>
         <h1>{{profile_user.username}}</h1>
         <h5>{{profile_user.profile.location}}</h5>
-        <p>Followers:{{followers}} Following:{{following}}</p>
+        <p class="follower-count">Followers:{{followers}} Following:{{following}}</p>
         <p>{{profile_user.profile.bio}}</p>
 
         
         {% if user != profile_user %}
-            <form action="{% url 'toggle_follow' profile_user.id %}" method="POST">
+            <form class="follow-form" data-user-id="{{profile_user.id}}" data-url="{% url 'toggle_follow' profile_user.id %}" method="POST">
                 {% csrf_token %}
                 
-                {% if is_following %}
-                    <button type="submit">Unfollow</button> 
-
-                {% else %}
-                    <button type="submit">Follow</button> 
-                {% endif %}
+                <button type="submit">
+                    {% if is_following %}
+                        <span class="follow-label">Unfollow</span>
+                    {% else %}
+                        <span class="follow-label">Follow</span>
+                    {% endif %}   
+                </button>
+                
             </form>   
         {% endif %}   
     </div>
@@ -30,4 +32,26 @@
             <p>{{tweet.content}}</p>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.querySelectorAll('.follow-form').forEach((form)=>{
+            form.addEventListener('submit', function(event){
+                event.preventDefault();
+
+                fetch(form.dataset.url, {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                }).then(response => response.json()).then(data => {
+                    const label = form.querySelector('.follow-label');
+                    const count = document.querySelector('.follower-count');
+                    label.textContent = data.is_follow ? 'Unfollow' : 'Follow';
+                    count.textContent = `Followers: ${data.follower_count} Following: {{following}}`;
+                })
+            })
+        })
+    </script>
 {% endblock %}
