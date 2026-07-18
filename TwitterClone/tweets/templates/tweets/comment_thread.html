@@ -1,0 +1,14 @@
+<div style="margin-left: 20px;">
+    <p><strong>{{ comment.author.username }}</strong>: {{ comment.content }}</p>
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+        <input type="text" name="content" placeholder="Write a reply...">
+        <button type="submit">Reply</button>
+    </form>
+
+    {% for reply in comment.replies.all %}
+        {% include 'tweets/comment_thread.html' with comment=reply %}
+    {% endfor %}
+</div>

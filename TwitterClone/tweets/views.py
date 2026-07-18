@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed, JsonResponse
-from .forms import TweetForm
+from .forms import TweetForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .models import Tweet, Like
+from .models import Tweet, Like, Comment
 
 
 # Create your views here.
@@ -21,13 +21,6 @@ def create_tweet(request):
         form = TweetForm()
 
     return render(request, 'tweets/create_tweet.html', {'form': form})
-
-
-
-def feed(request):
-    tweets = Tweet.objects.all().order_by('-created_at')
-
-    return render(request, 'tweets/feed.html', {'tweets': tweets})
 
 
 
@@ -91,3 +84,28 @@ def feed(request):
         liked_tweet_ids = set()
     
     return render(request, 'tweets/feed.html', {'tweets': tweets, 'liked_tweet_ids': liked_tweet_ids})
+
+
+
+def comment_section(request, tweet_id):
+    tweet = get_object_or_404(Tweet, pk=tweet_id)
+    comments = tweet.comments.filter(parent=None).order_by('-created_at')
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.tweet = tweet
+            comment.author = request.user
+            parent_id = request.POST.get('parent_id')
+            
+            if parent_id:
+                comment.parent = get_object_or_404(Comment, pk=parent_id)
+            
+            comment.save()
+            return redirect('comment_section', tweet_id=tweet.id)
+        
+    else:
+        form = CommentForm()
+
+    return render(request, 'tweets/comments.html', {'comments': comments, 'tweet': tweet, 'form': form})
