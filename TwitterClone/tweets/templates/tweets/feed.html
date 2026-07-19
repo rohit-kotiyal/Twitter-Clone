@@ -21,6 +21,8 @@
                     {% endif %}
                     (<span class="like-count">{{ tweet.likes.count }}</span>)
                 </button>
+
+                <a href="{%url 'comment_section' tweet.id%}">{{tweet.comments.count}} Comments</a>
             </form>
         </div>
         

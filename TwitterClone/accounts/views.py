@@ -27,7 +27,10 @@ def profile(request, username):
     followers = profile_user.followers.count()
     followings = profile_user.following.count()
 
-    is_following = Follow.objects.filter(follower=request.user, followed=profile_user).exists()
+    if request.user.is_authenticated:
+        is_following = Follow.objects.filter(follower=request.user, followed=profile_user).exists()
+    else:
+        is_following = False
 
     context_dict = {
         'profile_user': profile_user,

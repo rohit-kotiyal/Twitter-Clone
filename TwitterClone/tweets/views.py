@@ -56,6 +56,8 @@ def edit_tweet(request, tweet_id):
     return render(request, 'tweets/edit_tweet.html', {'form': form})
 
 
+
+
 @login_required
 def toggle_like(request, tweet_id):
     tweet = get_object_or_404(Tweet, pk=tweet_id)
@@ -109,3 +111,20 @@ def comment_section(request, tweet_id):
         form = CommentForm()
 
     return render(request, 'tweets/comments.html', {'comments': comments, 'tweet': tweet, 'form': form})
+
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+
+    if comment.author != request.user:
+        return HttpResponseForbidden("You can't delete this comment.")
+    
+    else:
+        if request.method == "POST":
+            tweet_id = comment.tweet.id
+            comment.delete()
+            return redirect('comment_section', tweet_id=tweet_id)
+
+    return HttpResponseNotAllowed(['POST'])

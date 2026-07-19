@@ -1,6 +1,10 @@
 <div style="margin-left: 20px;">
     <p><strong>{{ comment.author.username }}</strong>: {{ comment.content }}</p>
 
+    <form onsubmit="return confirm('Delete this comment?')" action="{% url 'delete_comment' comment.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+    </form>
     <form action="" method="POST">
         {% csrf_token %}
         <input type="hidden" name="parent_id" value="{{ comment.id }}">

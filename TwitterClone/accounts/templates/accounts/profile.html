@@ -23,7 +23,6 @@
                         <span class="follow-label">Follow</span>
                     {% endif %}   
                 </button>
-                
             </form>   
         {% endif %}   
     </div>
@@ -40,6 +39,11 @@
             form.addEventListener('submit', function(event){
                 event.preventDefault();
 
+                {% if not user.is_authenticated %}
+                    window.location.href = "{% url 'login' %}";
+                    return;
+                {% endif %}
+
                 fetch(form.dataset.url, {
                     method: "POST",
                     headers: {
@@ -49,7 +53,7 @@
                     const label = form.querySelector('.follow-label');
                     const count = document.querySelector('.follower-count');
                     label.textContent = data.is_follow ? 'Unfollow' : 'Follow';
-                    count.textContent = `Followers: ${data.follower_count} Following: {{following}}`;
+                    count.textContent = `Followers: ${data.follower_count} Following: {{ following }}`;
                 })
             })
         })

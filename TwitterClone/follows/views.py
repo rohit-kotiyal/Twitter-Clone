@@ -13,7 +13,7 @@ def toggle_follow(request, user_id):
 
     if request.user == target_user:
         return HttpResponseForbidden("You can't follow yourself.")
-
+    
     follow = Follow.objects.filter(follower=request.user, followed=target_user)
     is_follow = None
 
