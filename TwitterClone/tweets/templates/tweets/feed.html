@@ -11,7 +11,7 @@
         <button type="submit">Search</button>
     </form>
 
-    {% for tweet in tweets %}
+    {% for tweet in page_obj %}
         <div>
             <a href="{% url 'profile' tweet.author.username %}"><h2>{{tweet.author.username}}</h2></a>
             <p>{{tweet.content}}</p>
@@ -51,6 +51,17 @@
         {% empty %}
                 <p>No tweets yet.</p>
     {% endfor %}
+
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page={{page_obj.previous_page_number}}">Previous</a>
+        {% endif %}
+        Page {{page_obj.number}} of {{page_obj.paginator.num_pages}}
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{page_obj.next_page_number}}">Next</a>
+        {% endif %}               
+    </div>
 
 {% endblock %}
 

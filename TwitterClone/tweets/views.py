@@ -3,6 +3,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotAllowed, JsonRespo
 from .forms import TweetForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from .models import Tweet, Like, Comment
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -79,13 +80,17 @@ def toggle_like(request, tweet_id):
 
 def feed(request):
     tweets = Tweet.objects.all().order_by('-created_at')
+    paginator = Paginator(tweets, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
 
     if request.user.is_authenticated:
         liked_tweet_ids = set(Like.objects.filter(user=request.user).values_list('tweet_id', flat=True))
     else:
         liked_tweet_ids = set()
     
-    return render(request, 'tweets/feed.html', {'tweets': tweets, 'liked_tweet_ids': liked_tweet_ids})
+    return render(request, 'tweets/feed.html', {'liked_tweet_ids': liked_tweet_ids, 'page_obj': page_obj})
 
 
 
@@ -135,12 +140,13 @@ def delete_comment(request, comment_id):
 
 def search(request):
     query = request.GET.get('q', '')
-    
     if not query:
         return redirect('feed')
-    
+
     tweets = Tweet.objects.filter(content__icontains=query)
+    paginator = Paginator(tweets, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
-
-    return render(request, 'tweets/search.html', {'tweets': tweets, 'query': query})
+    return render(request, 'tweets/search.html', {'page_obj': page_obj, 'query': query})
 
