@@ -6,6 +6,11 @@
 
 {% block content %}
 
+    <form action="{% url 'search' %}" method="GET">
+        <input type="text" name="q" placeholder="Search tweets...">
+        <button type="submit">Search</button>
+    </form>
+
     {% for tweet in tweets %}
         <div>
             <a href="{% url 'profile' tweet.author.username %}"><h2>{{tweet.author.username}}</h2></a>

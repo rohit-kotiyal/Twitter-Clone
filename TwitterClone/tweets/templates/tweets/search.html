@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block content %}
+    <h2>Results for: {{query}}</h2>
+
+    {% for tweet in tweets %}
+        <div>
+            <a href="{% url 'profile' tweet.author.username %}">{{tweet.author.username}}</a>
+            <p>{{tweet.content}}</p>
+        </div>
+        {% empty %}
+            <p>No content found.!</p>
+    {% endfor %}
+{% endblock %}

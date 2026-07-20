@@ -128,3 +128,19 @@ def delete_comment(request, comment_id):
             return redirect('comment_section', tweet_id=tweet_id)
 
     return HttpResponseNotAllowed(['POST'])
+
+
+
+
+
+def search(request):
+    query = request.GET.get('q', '')
+    
+    if not query:
+        return redirect('feed')
+    
+    tweets = Tweet.objects.filter(content__icontains=query)
+
+
+    return render(request, 'tweets/search.html', {'tweets': tweets, 'query': query})
+
